@@ -2,8 +2,11 @@ package net.consentmanager.kmm.cmpsdkdemoapp;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -22,21 +25,26 @@ import kotlinx.serialization.json.JsonObject;
 public class CMPDemoActivity extends ComponentActivity implements CMPManagerDelegate {
 
     private JavaCMPManager cmpManager;
+    private Handler mainHandler;
+    private WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cmp_demo);
 
+        mainHandler = new Handler(Looper.getMainLooper());
+        webView = new WebView(this);
+
         UrlConfig urlConfig = new UrlConfig(
-                "09cb5dca91e6b",
+                "Your Code ID goes here",  // TODO: replace this with the Code ID from your CMP
                 "delivery.consentmanager.net",
                 "EN",
                 "CMDemoAppJava"
         );
 
         ConsentLayerUIConfig webViewConfig = new ConsentLayerUIConfig(
-                ConsentLayerUIConfig.Position.HALF_SCREEN_BOTTOM, // TO-DO: not implemented yet
+                ConsentLayerUIConfig.Position.FULL_SCREEN,
                 ConsentLayerUIConfig.BackgroundStyle.dimmed(Color.BLACK, 0.5f),
                 10f,
                 true,
@@ -45,31 +53,32 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
 
         cmpManager = JavaCMPManager.getInstance(this, urlConfig, webViewConfig, this);
         cmpManager.setActivity(this);
+        cmpManager.setWebView(webView);
 
         setupButtons();
     }
 
     private void setupButtons() {
-        setupButton(R.id.btnHasConsent, this::checkHasUserChoice);
-        setupButton(R.id.btnHasPurpose, this::checkHasPurpose);
-        setupButton(R.id.btnHasVendor, this::checkHasVendor);
-        setupButton(R.id.btnGetCmpString, this::getCmpString);
-        setupButton(R.id.btnGetAllPurposes, this::getAllPurposes);
-        setupButton(R.id.btnGetEnabledPurposes, this::getEnabledPurposes);
-        setupButton(R.id.btnGetDisabledPurposes, this::getDisabledPurposes);
-        setupButton(R.id.btnGetAllVendors, this::getAllVendors);
-        setupButton(R.id.btnGetEnabledVendors, this::getEnabledVendors);
-        setupButton(R.id.btnGetDisabledVendors, this::getDisabledVendors);
-        setupButton(R.id.btnCheckAndOpenConsentLayer, this::checkAndOpenConsentLayer);
-        setupButton(R.id.btnCheckConsentRequired, this::checkConsentRequired);
-        setupButton(R.id.btnEnableVendorList, this::enableVendorList);
-        setupButton(R.id.btnDisableVendorList, this::disableVendorList);
-        setupButton(R.id.btnEnablePurposeList, this::enablePurposeList);
-        setupButton(R.id.btnDisablePurposeList, this::disablePurposeList);
-        setupButton(R.id.btnRejectAll, this::rejectAll);
-        setupButton(R.id.btnAcceptAll, this::acceptAll);
-        setupButton(R.id.btnReset, this::reset);
-        setupButton(R.id.btnOpenConsentLayer, this::openConsentLayer);
+        setupButton(R.id.btnHasConsent, v -> checkHasUserChoice());
+        setupButton(R.id.btnHasPurpose, v -> checkHasPurpose());
+        setupButton(R.id.btnHasVendor, v -> checkHasVendor());
+        setupButton(R.id.btnGetCmpString, v -> getCmpString());
+        setupButton(R.id.btnGetAllPurposes, v -> getAllPurposes());
+        setupButton(R.id.btnGetEnabledPurposes, v -> getEnabledPurposes());
+        setupButton(R.id.btnGetDisabledPurposes, v -> getDisabledPurposes());
+        setupButton(R.id.btnGetAllVendors, v -> getAllVendors());
+        setupButton(R.id.btnGetEnabledVendors, v -> getEnabledVendors());
+        setupButton(R.id.btnGetDisabledVendors, v -> getDisabledVendors());
+        setupButton(R.id.btnCheckAndOpenConsentLayer, v -> checkAndOpenConsentLayer());
+        setupButton(R.id.btnCheckConsentRequired, v -> checkConsentRequired());
+        setupButton(R.id.btnEnableVendorList, v -> enableVendorList());
+        setupButton(R.id.btnDisableVendorList, v -> disableVendorList());
+        setupButton(R.id.btnEnablePurposeList, v -> enablePurposeList());
+        setupButton(R.id.btnDisablePurposeList, v -> disablePurposeList());
+        setupButton(R.id.btnRejectAll, v -> rejectAll());
+        setupButton(R.id.btnAcceptAll, v -> acceptAll());
+        setupButton(R.id.btnReset, v -> reset());
+        setupButton(R.id.btnOpenConsentLayer, v -> openConsentLayer());
     }
 
     private void setupButton(int buttonId, View.OnClickListener listener) {
@@ -77,62 +86,62 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
         button.setOnClickListener(listener);
     }
 
-    private void checkHasUserChoice(View v) {
+    private void checkHasUserChoice() {
         boolean hasConsent = cmpManager.hasUserChoice();
         showToast("Has Consent: " + hasConsent);
     }
 
-    private void checkHasPurpose(View v) {
+    private void checkHasPurpose() {
         boolean hasPurpose = cmpManager.hasPurposeConsent("c53");
         showToast("Has Purpose c53: " + hasPurpose);
     }
 
-    private void checkHasVendor(View v) {
+    private void checkHasVendor() {
         boolean hasVendor = cmpManager.hasVendorConsent("s2789");
         showToast("Has Vendor s2789: " + hasVendor);
     }
 
-    private void getCmpString(View v) {
+    private void getCmpString() {
         String cmpString = cmpManager.exportCMPInfo();
         showToast("CMP String: " + cmpString);
     }
 
-    private void getAllPurposes(View v) {
+    private void getAllPurposes() {
         String allPurposes = Arrays.toString(cmpManager.getAllPurposesIDs().toArray());
         showToast("All Purposes: " + allPurposes);
     }
 
-    private void getEnabledPurposes(View v) {
+    private void getEnabledPurposes() {
         String enabledPurposes = Arrays.toString(cmpManager.getEnabledPurposesIDs().toArray());
         showToast("Enabled Purposes: " + enabledPurposes);
     }
 
-    private void getDisabledPurposes(View v) {
+    private void getDisabledPurposes() {
         String disabledPurposes = Arrays.toString(cmpManager.getDisabledPurposesIDs().toArray());
         showToast("Disabled Purposes: " + disabledPurposes);
     }
 
-    private void getAllVendors(View v) {
+    private void getAllVendors() {
         String allVendors = Arrays.toString(cmpManager.getAllVendorsIDs().toArray());
         showToast("All Vendors: " + allVendors);
     }
 
-    private void getEnabledVendors(View v) {
+    private void getEnabledVendors() {
         String enabledVendors = Arrays.toString(cmpManager.getEnabledVendorsIDs().toArray());
         showToast("Enabled Vendors: " + enabledVendors);
     }
 
-    private void getDisabledVendors(View v) {
+    private void getDisabledVendors() {
         String disabledVendors = Arrays.toString(cmpManager.getDisabledVendorsIDs().toArray());
         showToast("Disabled Vendors: " + disabledVendors);
     }
 
-    private void reset(View v) {
+    private void reset() {
         cmpManager.resetConsentManagementData();
         showToast("All Consent Data Deleted");
     }
 
-    private void checkAndOpenConsentLayer(View v) {
+    private void checkAndOpenConsentLayer() {
         cmpManager.checkWithServerAndOpenIfNecessary(result -> {
             if (result.isSuccess()) {
                 showToast("Check and Open Consent Layer operation done successfully.");
@@ -143,11 +152,11 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
         });
     }
 
-    private void checkConsentRequired(View v) {
+    private void checkConsentRequired() {
         cmpManager.checkIfConsentIsRequired(needsConsent -> showToast("Needs Consent: " + needsConsent));
     }
 
-    private void enableVendorList(View v) {
+    private void enableVendorList() {
         cmpManager.acceptVendors(Arrays.asList("s2790", "s2791"), result -> {
             if (result.isSuccess()) {
                 showToast("Vendors Enabled");
@@ -158,7 +167,7 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
         });
     }
 
-    private void disableVendorList(View v) {
+    private void disableVendorList() {
         cmpManager.rejectVendors(Arrays.asList("s2790", "s2791"), result -> {
             if (result.isSuccess()) {
                 showToast("Vendors Disabled");
@@ -169,7 +178,7 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
         });
     }
 
-    private void enablePurposeList(View v) {
+    private void enablePurposeList() {
         cmpManager.acceptPurposes(Arrays.asList("c51", "c52"), true, result -> {
             if (result.isSuccess()) {
                 showToast("Purposes enabled");
@@ -180,7 +189,7 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
         });
     }
 
-    private void disablePurposeList(View v) {
+    private void disablePurposeList() {
         cmpManager.rejectPurposes(Arrays.asList("c51", "c52"), true, result -> {
             if (result.isSuccess()) {
                 showToast("Purposes disabled");
@@ -191,7 +200,7 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
         });
     }
 
-    private void rejectAll(View v) {
+    private void rejectAll() {
         cmpManager.rejectAll(result -> {
             if (result.isSuccess()) {
                 showToast("All consents rejected");
@@ -202,7 +211,7 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
         });
     }
 
-    private void acceptAll(View v) {
+    private void acceptAll() {
         cmpManager.acceptAll(result -> {
             if (result.isSuccess()) {
                 showToast("All consents accepted");
@@ -213,7 +222,7 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
         });
     }
 
-    private void openConsentLayer(View v) {
+    private void openConsentLayer() {
         cmpManager.openConsentLayer(result -> {
             if (!result.isSuccess()) {
                 showToast("Error: " + result.exceptionOrNull());
@@ -223,7 +232,7 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
     }
 
     private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        mainHandler.post(() -> Toast.makeText(CMPDemoActivity.this, message, Toast.LENGTH_SHORT).show());
     }
 
     @Override
@@ -243,7 +252,7 @@ public class CMPDemoActivity extends ComponentActivity implements CMPManagerDele
 
     @Override
     public void didReceiveError(@NonNull String error) {
-
+        Log.e("CMP JavaDemoApp", "Error received: " + error);
     }
 
     @Override
