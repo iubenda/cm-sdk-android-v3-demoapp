@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CMP Manager Methods"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btnHasConsent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Has User Choice?" />
+
+        <Button
+            android:id="@+id/btnHasPurpose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Has Purpose ID c53?" />
+
+        <Button
+            android:id="@+id/btnHasVendor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Has Vendor ID s2789?" />
+
+        <Button
+            android:id="@+id/btnGetCmpString"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get CMP String" />
+
+        <Button
+            android:id="@+id/btnGetAllPurposes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get All Purposes" />
+
+        <Button
+            android:id="@+id/btnGetEnabledPurposes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get Enabled Purposes" />
+
+        <Button
+            android:id="@+id/btnGetDisabledPurposes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get Disabled Purposes" />
+
+        <Button
+            android:id="@+id/btnGetAllVendors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get All Vendors" />
+
+        <Button
+            android:id="@+id/btnGetEnabledVendors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get Enabled Vendors" />
+
+        <Button
+            android:id="@+id/btnGetDisabledVendors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get Disabled Vendors" />
+
+        <Button
+            android:id="@+id/btnReset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reset" />
+
+        <Button
+            android:id="@+id/btnCheckAndOpenConsentLayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Check and Open Consent Layer" />
+
+        <Button
+            android:id="@+id/btnCheckConsentRequired"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Check Consent Required" />
+
+        <Button
+            android:id="@+id/btnEnableVendorList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enable Vendors s2790 and 2791" />
+
+        <Button
+            android:id="@+id/btnDisableVendorList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Disable Vendors s2790 and s2791" />
+
+        <Button
+            android:id="@+id/btnEnablePurposeList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enable Purposes c52 and c53" />
+
+        <Button
+            android:id="@+id/btnDisablePurposeList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Disable Purposes c52 and c53" />
+
+        <Button
+            android:id="@+id/btnRejectAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reject All" />
+
+        <Button
+            android:id="@+id/btnAcceptAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Accept All" />
+
+        <Button
+            android:id="@+id/btnOpenConsentLayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Open Consent Layer" />
+
+    </LinearLayout>
+</ScrollView>

@@ -31,7 +31,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
             )
 
             DemoButton(
-                text = "Has Consent?",
+                text = "Has User Choice?",
                 onClick = {
                     val hasConsent = cmpManager.hasUserChoice()
                     toastMessage = "Has Consent: $hasConsent"
