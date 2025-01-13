@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity(), CMPManagerDelegate {
         enableEdgeToEdge()
 
         val urlConfig = UrlConfig(
-            id = "09cb5dca91e6b",
+            id = "Your-Code-ID-goes-here",
             domain = "delivery.consentmanager.net",
             language = "EN",
             appName = "CMDemoAppKotlin"
