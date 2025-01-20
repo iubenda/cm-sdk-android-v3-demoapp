@@ -4,11 +4,13 @@ package net.consentmanager.kmm.cmpsdkdemoapp
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import net.consentmanager.cm_sdk_android_v3.CMPManager
 
@@ -266,18 +268,41 @@ fun Toast(
     onDismiss: () -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding() // This ensures we respect system bars
+            .navigationBarsPadding(), // Additional padding for navigation bar
         contentAlignment = Alignment.BottomCenter
     ) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = onDismiss) {
+        Surface(
+            modifier = Modifier
+                .padding(16.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            tonalElevation = 2.dp
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = message,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 16.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                TextButton(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
                     Text("Dismiss")
                 }
             }
-        ) {
-            Text(message)
         }
     }
 }
