@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity(), CMPManagerDelegate {
     }
 
     private fun checkAndOpenConsentLayer() {
-        cmpManager.checkWithServerAndOpenIfNecessary { result ->
+        cmpManager.checkAndOpen(false) { result ->
             result.onSuccess {
                 showCMPDemoScreen()
             }.onFailure { error ->

@@ -1,29 +1,48 @@
 package net.consentmanager.kmm.cmpsdkdemoapp
 
-// CMPDemoScreen.kt
-
-import androidx.compose.foundation.layout.*
+import android.preference.PreferenceManager
+import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import net.consentmanager.cm_sdk_android_v3.CMPManager
 
 @Composable
 fun CMPDemoScreen(cmpManager: CMPManager) {
     var toastMessage by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -33,17 +52,32 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
             )
 
             DemoButton(
-                text = "Has User Choice?",
+                text = "Check User Status",
                 onClick = {
-                    val hasConsent = cmpManager.hasUserChoice()
-                    toastMessage = "Has Consent: $hasConsent"
+                    val status = cmpManager.getUserStatus()
+                    Log.d("CMPDemo", "User Status: ${status.hasUserChoice}")
+                    Log.d("CMPDemo", "TCF: ${status.tcf}")
+                    Log.d("CMPDemo", "Additional Consent: ${status.addtlConsent}")
+                    Log.d("CMPDemo", "Regulation: ${status.regulation}")
+
+                    Log.d("CMPDemo", "---- Vendors Status ----")
+                    status.vendors.forEach { (vendorId, choice) ->
+                        Log.d("CMPDemo", "Vendor $vendorId: $choice")
+                    }
+
+                    Log.d("CMPDemo", "---- Purposes Status ----")
+                    status.purposes.forEach { (purposeId, choice) ->
+                        Log.d("CMPDemo", "Purpose $purposeId: $choice")
+                    }
+
+                    toastMessage = "Check Logcat for User Status"
                 }
             )
 
             DemoButton(
                 text = "Has Purpose ID c53?",
                 onClick = {
-                    val hasPurpose = cmpManager.hasPurposeConsent("c53")
+                    val hasPurpose = cmpManager.getStatusForPurpose("c53")
                     toastMessage = "Has Purpose: $hasPurpose"
                 }
             )
@@ -51,7 +85,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
             DemoButton(
                 text = "Has Vendor ID s2789?",
                 onClick = {
-                    val hasVendor = cmpManager.hasVendorConsent("s2789")
+                    val hasVendor = cmpManager.getStatusForVendor("s2789")
                     toastMessage = "Has Vendor: $hasVendor"
                 }
             )
@@ -65,71 +99,16 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
             )
 
             DemoButton(
-                text = "Get All Purposes",
-                onClick = {
-                    val allPurposes = cmpManager.getAllPurposesIDs()
-                    toastMessage = "All Purposes: $allPurposes"
-                }
-            )
-
-            DemoButton(
-                text = "Get Enabled Purposes",
-                onClick = {
-                    val enabledPurposes = cmpManager.getEnabledPurposesIDs()
-                    toastMessage = "Enabled Purposes: $enabledPurposes"
-                }
-            )
-
-            DemoButton(
-                text = "Get Disabled Purposes",
-                onClick = {
-                    val disabledPurposes = cmpManager.getDisabledPurposesIDs()
-                    toastMessage = "Disabled Purposes: ${disabledPurposes.joinToString(", ")}"
-                }
-            )
-
-            DemoButton(
-                text = "Get All Vendors",
-                onClick = {
-                    val allVendors = cmpManager.getAllVendorsIDs()
-                    toastMessage = "All Vendors: $allVendors"
-                }
-            )
-
-            DemoButton(
-                text = "Get Enabled Vendors",
-                onClick = {
-                    val enabledVendors = cmpManager.getEnabledVendorsIDs()
-                    toastMessage = "Enabled Vendors: $enabledVendors"
-                }
-            )
-
-            DemoButton(
-                text = "Get Disabled Vendors",
-                onClick = {
-                    val disabledVendors = cmpManager.getDisabledVendorsIDs()
-                    toastMessage = "Disabled Vendors: ${disabledVendors.joinToString(", ")}"
-                }
-            )
-
-            DemoButton(
                 text = "Check and Open Consent Layer",
                 onClick = {
-                    cmpManager.checkWithServerAndOpenIfNecessary { result ->
+                    cmpManager.checkAndOpen() { result ->
                         result.onSuccess {
-                            toastMessage = "Check and Open Consent Layer operation done successfully."
+                            toastMessage =
+                                "Check and Open Consent Layer operation done successfully."
                         }.onFailure { error ->
-                            toastMessage = "Check and Open Consent Layer operation failed with error: $error"
+                            toastMessage =
+                                "Check and Open Consent Layer operation failed with error: $error"
                         }
-                    }
-                }
-            )
-
-            DemoButton(
-                text = "Check Consent Required",
-                onClick = {
-                    cmpManager.checkIfConsentIsRequired { needsConsent ->
-                        toastMessage = "Needs Consent: $needsConsent"
                     }
                 }
             )
@@ -215,7 +194,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
             DemoButton(
                 text = "Open Consent Layer",
                 onClick = {
-                    cmpManager.openConsentLayer { result ->
+                    cmpManager.forceOpen() { result ->
                         result.onFailure { error ->
                             toastMessage = "Error: ${error.message}"
                         }
@@ -234,14 +213,55 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
             DemoButton(
                 text = "Import CMP String",
                 onClick = {
-                    cmpManager.openConsentLayer { result ->
-                        result.onFailure { error ->
+                    cmpManager.importCMPInfo("Q1FMVW10Z1FMVW10Z0FmUTVDSVRCWUZnQUFBQUFBQUFBQWlnS3dOWF9HX19iWGx2LVg3MzZmdGtlWTFmOTloNzdzUXhCaGZKcy00RnpMdldfSndYMzJFek5FMzZ0cVlLbVJJQXUzVEJJUU50R0pqVVJWQ2hhb2dWcnpEc2FFeVVvVHRLSi1Ca2lITVJZMmRZQ0Z4dm00dGplUUNaNXZyXzkxZDUyUl90N2RyLTNkenl5NWhudjNhOV8tUzFXSmlkSzUtdEhfdjliUk9iLV9JLTlfeC1fNHY0X05fcEUyX2VUMXRfdFd2dDczOS04dHZfOV9fOTlfX19fZl9fX19fXzNfLV9mX19mX19fOEZYd0NURFFxSUF5d0pDUWcwRENDQkFDb0t3Z0lvRUFRQUFKQTBRRUFKZ3dLZGdZQUxyQ1JBQ0FGQUFNRUFJQUFRWkFBZ0FBQWdBUWlBQ0FBb0VBQUVBZ1VBQVlBRUF3RUFCQXdBQWdBc0JBSUFBUUhRTVV3SUlCQXNBRWpNaW9Vd0lRZ0VnZ0piS2hCSUFnUVZ3aENMUEFJZ0VSTUZBQUFBQUFVZ0FDQXNGZ2NTU0FsUWtFQVhFRzBBQUJBQWdFRUFCUWdrNU1BQVFCbXkxQjRNRzBaV21BWVBtQ1JEVEFNZ0NJSXlFZzBBQUEjXzUxXzUyXzUzXzU0XzU1XzU2XyNfczI4MTVfYzY0MDQzX3MyODE0X3MyNzYyX3MyODg1X3MyODE5X3MyODQ2X3MzMDM1X3MyNDM0X1VfIzEtLS0j") { result ->
+                        result.onSuccess {
+                            toastMessage = "CMP String imported!"
+                        }.onFailure { error ->
                             toastMessage = "Error: ${error.message}"
                         }
                     }
                 }
             )
 
+            DemoButton(
+                text = "Get Google Consent Mode Settings",
+                onClick = {
+                    val settings = cmpManager.getGoogleConsentModeStatus()
+                    Log.d("CMPDemo", "Google Consent Mode Settings: $settings")
+                    toastMessage = buildString {
+                        append("Google Consent Settings:")
+                        settings.forEach { (key, value) ->
+                            append("\n$key: $value")
+                        }
+                    }
+                }
+            )
+
+            DemoButton(
+                text = "Inspect SharedPreferences",
+                onClick = {
+                    toastMessage = "Check logs for the list of stored key/value pairs on SharedPreference"
+
+                    val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+                    val allEntries = prefs.all
+
+                    Log.d("CMPPrefsInspector", "=== Start of SharedPreferences Dump ===")
+                    allEntries.forEach { (key, value) ->
+                        val valueType = when (value) {
+                            is String -> "String"
+                            is Int -> "Integer"
+                            is Boolean -> "Boolean"
+                            is Float -> "Float"
+                            is Long -> "Long"
+                            is Set<*> -> "Set"
+                            null -> "null"
+                            else -> value.javaClass.simpleName
+                        }
+                        Log.d("CMPPrefsInspector", "Key: $key, Type: $valueType, Value: $value")
+                    }
+                    Log.d("CMPPrefsInspector", "=== End of SharedPreferences Dump ===")
+                }
+            )
         }
 
         toastMessage?.let { message ->
@@ -270,8 +290,8 @@ fun Toast(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding() // This ensures we respect system bars
-            .navigationBarsPadding(), // Additional padding for navigation bar
+            .systemBarsPadding()
+            .navigationBarsPadding(),
         contentAlignment = Alignment.BottomCenter
     ) {
         Surface(
