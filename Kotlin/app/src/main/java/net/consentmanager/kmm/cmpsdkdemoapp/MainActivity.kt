@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity(), CMPManagerDelegate {
         enableEdgeToEdge()
 
         val urlConfig = UrlConfig(
-            id = "26cba6cf81e76",
+            id = "YOUR-CODE-ID-GOES-HERE",
             domain = "delivery.consentmanager.net",
             language = "EN",
             appName = "CMDemoAppKotlin"
@@ -99,19 +99,19 @@ class MainActivity : ComponentActivity(), CMPManagerDelegate {
         cmpManager.onActivityDestroyed()
     }
 
-    override fun didReceiveConsent(consent: String, jsonObject: JsonObject) {
-        Log.d("CMP DemoApp", "Consent Layer successfully received consent message.")
-        runOnUiThread {
-            showCMPDemoScreen()
-        }
-    }
-
     override fun didShowConsentLayer() {
         Log.d("CMP DemoApp", "Consent Layer open message received.")
     }
 
     override fun didCloseConsentLayer() {
         Log.d("CMP DemoApp", "Consent Layer close message received.")
+        runOnUiThread {
+            showCMPDemoScreen()
+        }
+    }
+
+    override fun didReceiveConsent(consent: String, jsonObject: Map<String, Any>) {
+        Log.d("CMP DemoApp", "Consent Layer successfully received consent message.")
         runOnUiThread {
             showCMPDemoScreen()
         }
