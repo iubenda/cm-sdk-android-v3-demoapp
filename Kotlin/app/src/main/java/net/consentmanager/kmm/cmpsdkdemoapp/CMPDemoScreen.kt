@@ -203,6 +203,17 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
             )
 
             DemoButton(
+                text = "Jump to Settings Page",
+                onClick = {
+                    cmpManager.forceOpen(jumpToSettings = true) { result ->
+                        result.onFailure { error ->
+                            toastMessage = "Error: ${error.message}"
+                        }
+                    }
+                }
+            )
+
+            DemoButton(
                 text = "Reset",
                 onClick = {
                     cmpManager.resetConsentManagementData()

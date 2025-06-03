@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import kotlinx.serialization.json.JsonObject
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import net.consentmanager.cm_sdk_android_v3.CMPManager
 import net.consentmanager.cm_sdk_android_v3.CMPManagerDelegate
 import net.consentmanager.cm_sdk_android_v3.ConsentLayerUIConfig
@@ -19,10 +21,13 @@ import net.consentmanager.cm_sdk_android_v3.UrlConfig
 
 class MainActivity : ComponentActivity(), CMPManagerDelegate {
     private lateinit var cmpManager: CMPManager
+    private lateinit var analytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        analytics = Firebase.analytics
 
         val urlConfig = UrlConfig(
             id = "YOUR-CODE-ID-GOES-HERE",
