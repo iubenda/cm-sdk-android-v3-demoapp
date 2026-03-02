@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -30,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 private val LANGUAGES = listOf("EN", "IT", "DE", "FR", "ES", "PT", "NL", "PL")
@@ -43,6 +45,9 @@ fun ConfigurationScreen(
     onLoadCMP: () -> Unit
 ) {
     var showValidationAlert by remember { mutableStateOf(false) }
+    var languageExpanded by remember { mutableStateOf(false) }
+    var positionExpanded by remember { mutableStateOf(false) }
+    var backgroundExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -75,12 +80,36 @@ fun ConfigurationScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    OutlinedTextField(
-                        value = configuration.language,
-                        onValueChange = { onConfigurationChange(configuration.copy(language = it)) },
-                        label = { Text("Language") },
-                        modifier = Modifier.fillMaxWidth().testTag("Language")
-                    )
+                    ExposedDropdownMenuBox(
+                        expanded = languageExpanded,
+                        onExpandedChange = { languageExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = configuration.language,
+                            onValueChange = { },
+                            readOnly = true,
+                            label = { Text("Language") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                                .testTag("Language")
+                        )
+                        DropdownMenu(
+                            expanded = languageExpanded,
+                            onDismissRequest = { languageExpanded = false }
+                        ) {
+                            LANGUAGES.forEach { lang ->
+                                DropdownMenuItem(
+                                    text = { Text(lang) },
+                                    onClick = {
+                                        onConfigurationChange(configuration.copy(language = lang))
+                                        languageExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
 
                     OutlinedTextField(
@@ -110,36 +139,66 @@ fun ConfigurationScreen(
                     Text("Webview Appearance", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Text("Position", style = MaterialTheme.typography.bodyMedium)
-                    WebviewPosition.entries.forEach { pos ->
-                        Row(
+                    ExposedDropdownMenuBox(
+                        expanded = positionExpanded,
+                        onExpandedChange = { positionExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = configuration.position.label,
+                            onValueChange = { },
+                            readOnly = true,
+                            label = { Text("Position") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = positionExpanded) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .testTag("Position"),
-                            verticalAlignment = Alignment.CenterVertically
+                                .menuAnchor()
+                                .testTag("Position")
+                        )
+                        DropdownMenu(
+                            expanded = positionExpanded,
+                            onDismissRequest = { positionExpanded = false }
                         ) {
-                            androidx.compose.material3.RadioButton(
-                                selected = configuration.position == pos,
-                                onClick = { onConfigurationChange(configuration.copy(position = pos)) }
-                            )
-                            Text(pos.label)
+                            WebviewPosition.entries.forEach { pos ->
+                                DropdownMenuItem(
+                                    text = { Text(pos.label) },
+                                    onClick = {
+                                        onConfigurationChange(configuration.copy(position = pos))
+                                        positionExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text("Background", style = MaterialTheme.typography.bodyMedium)
-                    WebviewBackgroundStyle.entries.forEach { style ->
-                        Row(
+                    ExposedDropdownMenuBox(
+                        expanded = backgroundExpanded,
+                        onExpandedChange = { backgroundExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = configuration.backgroundStyle.label,
+                            onValueChange = { },
+                            readOnly = true,
+                            label = { Text("Background") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = backgroundExpanded) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .testTag("Background"),
-                            verticalAlignment = Alignment.CenterVertically
+                                .menuAnchor()
+                                .testTag("Background")
+                        )
+                        DropdownMenu(
+                            expanded = backgroundExpanded,
+                            onDismissRequest = { backgroundExpanded = false }
                         ) {
-                            androidx.compose.material3.RadioButton(
-                                selected = configuration.backgroundStyle == style,
-                                onClick = { onConfigurationChange(configuration.copy(backgroundStyle = style)) }
-                            )
-                            Text(style.label)
+                            WebviewBackgroundStyle.entries.forEach { style ->
+                                DropdownMenuItem(
+                                    text = { Text(style.label) },
+                                    onClick = {
+                                        onConfigurationChange(configuration.copy(backgroundStyle = style))
+                                        backgroundExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
