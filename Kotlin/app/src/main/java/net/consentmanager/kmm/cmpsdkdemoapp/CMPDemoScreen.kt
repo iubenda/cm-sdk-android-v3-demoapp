@@ -1,6 +1,7 @@
 package net.consentmanager.kmm.cmpsdkdemoapp
 
 import android.preference.PreferenceManager
+import net.consentmanager.kmm.cmpsdkdemoapp.BuildConfig
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,21 +56,20 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
                 text = "Check User Status",
                 onClick = {
                     val status = cmpManager.getUserStatus()
-                    Log.d("CMPDemo", "User Status: ${status.hasUserChoice}")
-                    Log.d("CMPDemo", "TCF: ${status.tcf}")
-                    Log.d("CMPDemo", "Additional Consent: ${status.addtlConsent}")
-                    Log.d("CMPDemo", "Regulation: ${status.regulation}")
-
-                    Log.d("CMPDemo", "---- Vendors Status ----")
-                    status.vendors.forEach { (vendorId, choice) ->
-                        Log.d("CMPDemo", "Vendor $vendorId: $choice")
+                    if (BuildConfig.DEBUG) {
+                        Log.d("CMPDemo", "User Status: ${status.hasUserChoice}")
+                        Log.d("CMPDemo", "TCF: ${status.tcf}")
+                        Log.d("CMPDemo", "Additional Consent: ${status.addtlConsent}")
+                        Log.d("CMPDemo", "Regulation: ${status.regulation}")
+                        Log.d("CMPDemo", "---- Vendors Status ----")
+                        status.vendors.forEach { (vendorId, choice) ->
+                            Log.d("CMPDemo", "Vendor $vendorId: $choice")
+                        }
+                        Log.d("CMPDemo", "---- Purposes Status ----")
+                        status.purposes.forEach { (purposeId, choice) ->
+                            Log.d("CMPDemo", "Purpose $purposeId: $choice")
+                        }
                     }
-
-                    Log.d("CMPDemo", "---- Purposes Status ----")
-                    status.purposes.forEach { (purposeId, choice) ->
-                        Log.d("CMPDemo", "Purpose $purposeId: $choice")
-                    }
-
                     toastMessage = "Check Logcat for User Status"
                 }
             )
@@ -94,7 +94,9 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
                 text = "Get CMP String",
                 onClick = {
                     val cmpString = cmpManager.exportCMPInfo()
-                    toastMessage = "CMP String: $cmpString"
+                    if (BuildConfig.DEBUG) Log.d("CMPDemo", "Exported CMP String: $cmpString")
+                    val display = if (cmpString.length > 50) cmpString.take(50) + "…" else cmpString
+                    toastMessage = "CMP String: $display"
                 }
             )
 
@@ -238,7 +240,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
                 text = "Get Google Consent Mode Settings",
                 onClick = {
                     val settings = cmpManager.getGoogleConsentModeStatus()
-                    Log.d("CMPDemo", "Google Consent Mode Settings: $settings")
+                    if (BuildConfig.DEBUG) Log.d("CMPDemo", "Google Consent Mode Settings: $settings")
                     toastMessage = buildString {
                         append("Google Consent Settings:")
                         settings.forEach { (key, value) ->
@@ -252,25 +254,25 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
                 text = "Inspect SharedPreferences",
                 onClick = {
                     toastMessage = "Check logs for the list of stored key/value pairs on SharedPreference"
-
-                    val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-                    val allEntries = prefs.all
-
-                    Log.d("CMPPrefsInspector", "=== Start of SharedPreferences Dump ===")
-                    allEntries.forEach { (key, value) ->
-                        val valueType = when (value) {
-                            is String -> "String"
-                            is Int -> "Integer"
-                            is Boolean -> "Boolean"
-                            is Float -> "Float"
-                            is Long -> "Long"
-                            is Set<*> -> "Set"
-                            null -> "null"
-                            else -> value.javaClass.simpleName
+                    if (BuildConfig.DEBUG) {
+                        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+                        val allEntries = prefs.all
+                        Log.d("CMPPrefsInspector", "=== Start of SharedPreferences Dump ===")
+                        allEntries.forEach { (key, value) ->
+                            val valueType = when (value) {
+                                is String -> "String"
+                                is Int -> "Integer"
+                                is Boolean -> "Boolean"
+                                is Float -> "Float"
+                                is Long -> "Long"
+                                is Set<*> -> "Set"
+                                null -> "null"
+                                else -> value.javaClass.simpleName
+                            }
+                            Log.d("CMPPrefsInspector", "Key: $key, Type: $valueType, Value: $value")
                         }
-                        Log.d("CMPPrefsInspector", "Key: $key, Type: $valueType, Value: $value")
+                        Log.d("CMPPrefsInspector", "=== End of SharedPreferences Dump ===")
                     }
-                    Log.d("CMPPrefsInspector", "=== End of SharedPreferences Dump ===")
                 }
             )
         }
