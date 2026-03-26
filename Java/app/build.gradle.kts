@@ -38,6 +38,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation("net.consentmanager.sdkv3:cmsdkv3:0.2.0-alpha")
+    implementation("net.consentmanager.sdkv3:cmsdkv3:3.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 }
