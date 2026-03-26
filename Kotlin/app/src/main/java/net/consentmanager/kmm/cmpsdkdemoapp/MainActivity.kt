@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -85,7 +86,9 @@ class MainActivity : ComponentActivity(), CMPManagerDelegate {
     private fun ConsentLoadingScreen(onInit: () -> Unit) {
         LaunchedEffect(Unit) { onInit() }
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .safeDrawingPadding(),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()

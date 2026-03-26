@@ -3,6 +3,7 @@ package net.consentmanager.kmm.cmpsdkdemoapp
 import android.preference.PreferenceManager
 import net.consentmanager.kmm.cmpsdkdemoapp.BuildConfig
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import net.consentmanager.cm_sdk_android_v3.CMPManager
@@ -38,10 +41,15 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
     var toastMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(IosDemoPalette.screenBackground)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .safeDrawingPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -49,11 +57,13 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
         ) {
             Text(
                 text = "CMP Manager Methods",
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
+                color = IosDemoPalette.titleIndigo
             )
 
             DemoButton(
                 text = "Check User Status",
+                containerColor = IosDemoPalette.blue,
                 onClick = {
                     val status = cmpManager.getUserStatus()
                     if (BuildConfig.DEBUG) {
@@ -76,6 +86,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Has Purpose ID c53?",
+                containerColor = IosDemoPalette.mint,
                 onClick = {
                     val hasPurpose = cmpManager.getStatusForPurpose("c53")
                     toastMessage = "Has Purpose: $hasPurpose"
@@ -84,6 +95,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Has Vendor ID s2789?",
+                containerColor = IosDemoPalette.cyan,
                 onClick = {
                     val hasVendor = cmpManager.getStatusForVendor("s2789")
                     toastMessage = "Has Vendor: $hasVendor"
@@ -92,6 +104,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Get CMP String",
+                containerColor = IosDemoPalette.teal,
                 onClick = {
                     val cmpString = cmpManager.exportCMPInfo()
                     if (BuildConfig.DEBUG) Log.d("CMPDemo", "Exported CMP String: $cmpString")
@@ -102,6 +115,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Check and Open Consent Layer",
+                containerColor = IosDemoPalette.indigo,
                 onClick = {
                     cmpManager.checkAndOpen() { result ->
                         result.onSuccess {
@@ -116,7 +130,22 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
             )
 
             DemoButton(
+                text = "Check Consent Required",
+                containerColor = IosDemoPalette.indigo,
+                onClick = {
+                    cmpManager.isConsentRequired { result ->
+                        result.onSuccess { required ->
+                            toastMessage = "Consent required: $required"
+                        }.onFailure { error ->
+                            toastMessage = "Error: ${error.message}"
+                        }
+                    }
+                }
+            )
+
+            DemoButton(
                 text = "Enable Vendors s2790 and s2791",
+                containerColor = IosDemoPalette.cyan,
                 onClick = {
                     cmpManager.acceptVendors(listOf("s2790", "s2791")) { result ->
                         result.onSuccess {
@@ -130,6 +159,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Disable Vendors s2790 and s2791",
+                containerColor = IosDemoPalette.red,
                 onClick = {
                     cmpManager.rejectVendors(listOf("s2790", "s2791")) { result ->
                         result.onSuccess {
@@ -143,6 +173,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Enable Purposes c52 and c53",
+                containerColor = IosDemoPalette.mint,
                 onClick = {
                     cmpManager.acceptPurposes(listOf("c52", "c53"), true) { result ->
                         result.onSuccess {
@@ -156,6 +187,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Disable Purposes c52 and c53",
+                containerColor = IosDemoPalette.red,
                 onClick = {
                     cmpManager.rejectPurposes(listOf("c52", "c53"), true) { result ->
                         result.onSuccess {
@@ -169,6 +201,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Reject All",
+                containerColor = IosDemoPalette.red,
                 onClick = {
                     cmpManager.rejectAll { result ->
                         result.onSuccess {
@@ -182,6 +215,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Accept All",
+                containerColor = IosDemoPalette.green,
                 onClick = {
                     cmpManager.acceptAll { result ->
                         result.onSuccess {
@@ -195,6 +229,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Open Consent Layer",
+                containerColor = IosDemoPalette.indigo,
                 onClick = {
                     cmpManager.forceOpen() { result ->
                         result.onFailure { error ->
@@ -206,6 +241,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Jump to Settings Page",
+                containerColor = IosDemoPalette.indigo,
                 onClick = {
                     cmpManager.forceOpen(jumpToSettings = true) { result ->
                         result.onFailure { error ->
@@ -217,6 +253,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Reset",
+                containerColor = IosDemoPalette.black,
                 onClick = {
                     cmpManager.resetConsentManagementData()
                     toastMessage = "Consent data reset"
@@ -225,6 +262,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Import CMP String",
+                containerColor = IosDemoPalette.teal,
                 onClick = {
                     cmpManager.importCMPInfo("Q1FMVW10Z1FMVW10Z0FmUTVDSVRCWUZnQUFBQUFBQUFBQWlnS3dOWF9HX19iWGx2LVg3MzZmdGtlWTFmOTloNzdzUXhCaGZKcy00RnpMdldfSndYMzJFek5FMzZ0cVlLbVJJQXUzVEJJUU50R0pqVVJWQ2hhb2dWcnpEc2FFeVVvVHRLSi1Ca2lITVJZMmRZQ0Z4dm00dGplUUNaNXZyXzkxZDUyUl90N2RyLTNkenl5NWhudjNhOV8tUzFXSmlkSzUtdEhfdjliUk9iLV9JLTlfeC1fNHY0X05fcEUyX2VUMXRfdFd2dDczOS04dHZfOV9fOTlfX19fZl9fX19fXzNfLV9mX19mX19fOEZYd0NURFFxSUF5d0pDUWcwRENDQkFDb0t3Z0lvRUFRQUFKQTBRRUFKZ3dLZGdZQUxyQ1JBQ0FGQUFNRUFJQUFRWkFBZ0FBQWdBUWlBQ0FBb0VBQUVBZ1VBQVlBRUF3RUFCQXdBQWdBc0JBSUFBUUhRTVV3SUlCQXNBRWpNaW9Vd0lRZ0VnZ0piS2hCSUFnUVZ3aENMUEFJZ0VSTUZBQUFBQUFVZ0FDQXNGZ2NTU0FsUWtFQVhFRzBBQUJBQWdFRUFCUWdrNU1BQVFCbXkxQjRNRzBaV21BWVBtQ1JEVEFNZ0NJSXlFZzBBQUEjXzUxXzUyXzUzXzU0XzU1XzU2XyNfczI4MTVfYzY0MDQzX3MyODE0X3MyNzYyX3MyODg1X3MyODE5X3MyODQ2X3MzMDM1X3MyNDM0X1VfIzEtLS0j") { result ->
                         result.onSuccess {
@@ -238,6 +276,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Get Google Consent Mode Settings",
+                containerColor = IosDemoPalette.indigo,
                 onClick = {
                     val settings = cmpManager.getGoogleConsentModeStatus()
                     if (BuildConfig.DEBUG) Log.d("CMPDemo", "Google Consent Mode Settings: $settings")
@@ -252,6 +291,7 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 
             DemoButton(
                 text = "Inspect SharedPreferences",
+                containerColor = IosDemoPalette.gray,
                 onClick = {
                     toastMessage = "Check logs for the list of stored key/value pairs on SharedPreference"
                     if (BuildConfig.DEBUG) {
@@ -286,10 +326,19 @@ fun CMPDemoScreen(cmpManager: CMPManager) {
 }
 
 @Composable
-fun DemoButton(text: String, onClick: () -> Unit) {
+fun DemoButton(
+    text: String,
+    containerColor: Color,
+    onClick: () -> Unit
+) {
     Button(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = IosDemoPalette.white
+        )
     ) {
         Text(text)
     }
