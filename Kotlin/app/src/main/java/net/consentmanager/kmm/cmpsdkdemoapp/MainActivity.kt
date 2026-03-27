@@ -1,7 +1,6 @@
 package net.consentmanager.kmm.cmpsdkdemoapp
 
 import android.content.res.Configuration
-import net.consentmanager.kmm.cmpsdkdemoapp.BuildConfig
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,7 +24,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import net.consentmanager.cm_sdk_android_v3.CMPManager
 import net.consentmanager.cm_sdk_android_v3.CMPManagerDelegate
-import net.consentmanager.cm_sdk_android_v3.UrlConfig
 
 /** Intent extra to skip ConfigurationScreen (for UI tests). */
 const val EXTRA_SKIP_CONFIG = "skip_config"
@@ -60,7 +57,7 @@ class MainActivity : ComponentActivity(), CMPManagerDelegate {
                 ) {
                     when {
                         isConsentInitialized -> {
-                            cmpManager?.let { CMPDemoScreen(it) }
+                            cmpManager?.let { CMPDemoWithNav(it) }
                         }
                         hasConfiguration -> {
                             ConsentLoadingScreen(onInit = { initCMPAndOpenConsent() })

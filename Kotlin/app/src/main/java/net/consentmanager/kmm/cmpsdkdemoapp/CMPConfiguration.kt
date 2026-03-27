@@ -36,7 +36,9 @@ data class CMPConfiguration(
         id = trimmedCodeId,
         domain = domain.trim(),
         language = language,
-        appName = appName.trim()
+        appName = appName.trim(),
+        noHash = true,
+        webViewConnectionTimeoutMillis = 10000L
     )
 
     fun toConsentLayerUIConfig(): ConsentLayerUIConfig = ConsentLayerUIConfig(
@@ -50,7 +52,7 @@ data class CMPConfiguration(
 
     companion object {
         val default = CMPConfiguration(
-            codeId = "fa1d51c582f33",
+            codeId = "f5e3b73592c3c",
             language = "EN",
             appName = "CMDemoAppKotlin",
             domain = "delivery.consentmanager.net",

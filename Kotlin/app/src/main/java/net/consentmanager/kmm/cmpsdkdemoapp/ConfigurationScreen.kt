@@ -15,6 +15,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -92,7 +93,7 @@ fun ConfigurationScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor()
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                 .testTag("Language")
                         )
                         DropdownMenu(
@@ -151,7 +152,7 @@ fun ConfigurationScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = positionExpanded) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor()
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                 .testTag("Position")
                         )
                         DropdownMenu(
@@ -183,7 +184,7 @@ fun ConfigurationScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = backgroundExpanded) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor()
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                 .testTag("Background")
                         )
                         DropdownMenu(
@@ -257,11 +258,11 @@ fun ConfigurationScreen(
 
     if (showValidationAlert) {
         AlertDialog(
-            onDismissRequest = { showValidationAlert = false },
+            onDismissRequest = { },
             title = { Text("Invalid Configuration") },
             text = { Text(configuration.validationError ?: "") },
             confirmButton = {
-                Button(onClick = { showValidationAlert = false }) { Text("OK") }
+                Button(onClick = { }) { Text("OK") }
             }
         )
     }
