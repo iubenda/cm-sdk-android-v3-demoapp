@@ -22,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -64,6 +65,8 @@ fun CMPDemoScreen(
         loadingKeys = loadingKeys - key
     }
     fun isLoading(key: String) = key in loadingKeys
+
+    var importCmpText by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -309,13 +312,24 @@ fun CMPDemoScreen(
             }
         )
 
+        OutlinedTextField(
+            value = importCmpText,
+            onValueChange = { importCmpText = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("CMP string to import") },
+            singleLine = false,
+            minLines = 3,
+            maxLines = 8
+        )
+
         DemoButton(
             text = "Import CMP String",
             containerColor = IosDemoPalette.teal,
             isLoading = isLoading(LoadingKeys.IMPORT_CMP),
+            enabled = !importCmpText.isBlank(),
             onClick = {
                 beginLoad(LoadingKeys.IMPORT_CMP)
-                cmpManager.importCMPInfo("Q1FMVW10Z1FMVW10Z0FmUTVDSVRCWUZnQUFBQUFBQUFBQWlnS3dOWF9HX19iWGx2LVg3MzZmdGtlWTFmOTloNzdzUXhCaGZKcy00RnpMdldfSndYMzJFek5FMzZ0cVlLbVJJQXUzVEJJUU50R0pqVVJWQ2hhb2dWcnpEc2FFeVVvVHRLSi1Ca2lITVJZMmRZQ0Z4dm00dGplUUNaNXZyXzkxZDUyUl90N2RyLTNkenl5NWhudjNhOV8tUzFXSmlkSzUtdEhfdjliUk9iLV9JLTlfeC1fNHY0X05fcEUyX2VUMXRfdFd2dDczOS04dHZfOV9fOTlfX19fZl9fX19fXzNfLV9mX19mX19fOEZYd0NURFFxSUF5d0pDUWcwRENDQkFDb0t3Z0lvRUFRQUFKQTBRRUFKZ3dLZGdZQUxyQ1JBQ0FGQUFNRUFJQUFRWkFBZ0FBQWdBUWlBQ0FBb0VBQUVBZ1VBQVlBRUF3RUFCQXdBQWdBc0JBSUFBUUhRTVV3SUlCQXNBRWpNaW9Vd0lRZ0VnZ0piS2hCSUFnUVZ3aENMUEFJZ0VSTUZBQUFBQUFVZ0FDQXNGZ2NTU0FsUWtFQVhFRzBBQUJBQWdFRUFCUWdrNU1BQVFCbXkxQjRNRzBaV21BWVBtQ1JEVEFNZ0NJSXlFZzBBQUEjXzUxXzUyXzUzXzU0XzU1XzU2XyNfczI4MTVfYzY0MDQzX3MyODE0X3MyNzYyX3MyODg1X3MyODE5X3MyODQ2X3MzMDM1X3MyNDM0X1VfIzEtLS0j") { result ->
+                cmpManager.importCMPInfo(importCmpText.trim()) { result ->
                     endLoad(LoadingKeys.IMPORT_CMP)
                     result.onSuccess {
                         onLog("CMP string imported successfully")
@@ -511,18 +525,20 @@ fun DemoButton(
     containerColor: Color,
     isLoading: Boolean = false,
     debounceMs: Long = 400,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     var lastClickMs by remember { mutableLongStateOf(0L) }
+    val canClick = enabled && !isLoading
     Button(
         onClick = {
-            if (isLoading) return@Button
+            if (!canClick) return@Button
             val now = SystemClock.elapsedRealtime()
             if (now - lastClickMs < debounceMs) return@Button
             lastClickMs = now
             onClick()
         },
-        enabled = !isLoading,
+        enabled = canClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
