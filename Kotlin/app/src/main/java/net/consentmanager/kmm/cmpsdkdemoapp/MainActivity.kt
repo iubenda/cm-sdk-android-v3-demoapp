@@ -24,10 +24,16 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import net.consentmanager.cm_sdk_android_v3.CMPManager
 import net.consentmanager.cm_sdk_android_v3.CMPManagerDelegate
+import net.consentmanager.kmm.cmpsdkdemoapp.ui.theme.CMPSDKDemoAppTheme
 
 /** Intent extra to skip ConfigurationScreen (for UI tests). */
 const val EXTRA_SKIP_CONFIG = "skip_config"
 
+/**
+ * Demo application shell for exercising [CMPManager] during development, QA, and sales.
+ * UI changes here apply to this demo app only; they do not change consent UI embedded in host apps
+ * via the SDK (e.g. WebView or native consent layer).
+ */
 class MainActivity : ComponentActivity(), CMPManagerDelegate {
     private var cmpManager: CMPManager? = null
     private lateinit var analytics: FirebaseAnalytics
@@ -43,14 +49,16 @@ class MainActivity : ComponentActivity(), CMPManagerDelegate {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        analytics = Firebase.analytics
+        window.decorView.post {
+            analytics = Firebase.analytics
+        }
 
         if (skipConfig) {
             hasConfiguration = true
         }
 
         setContent {
-            MaterialTheme {
+            CMPSDKDemoAppTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
