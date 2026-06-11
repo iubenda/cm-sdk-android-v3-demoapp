@@ -55,7 +55,7 @@ data class CMPConfiguration(
             codeId = "f5e3b73592c3c",
             language = "EN",
             appName = "CMDemoAppKotlin",
-            domain = "delivery.consentmanager.net",
+            domain = "a.delivery.consentmanager.net",
             position = WebviewPosition.FULL_SCREEN,
             backgroundStyle = WebviewBackgroundStyle.DIMMED_BLACK,
             cornerRadius = 0f,

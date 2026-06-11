@@ -2,6 +2,7 @@ package net.consentmanager.kmm.cmpsdkdemoapp
 
 import android.content.Context
 import android.os.SystemClock
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,11 +16,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -34,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import net.consentmanager.cm_sdk_android_v3.CMPManager
 
@@ -54,7 +59,8 @@ private object LoadingKeys {
 @Composable
 fun CMPDemoScreen(
     cmpManager: CMPManager,
-    onLog: (String) -> Unit
+    onLog: (String) -> Unit,
+    onOperationSuccess: () -> Unit = {}
 ) {
     val context = LocalContext.current
     var loadingKeys by remember { mutableStateOf(setOf<String>()) }
@@ -67,23 +73,32 @@ fun CMPDemoScreen(
     fun isLoading(key: String) = key in loadingKeys
 
     var importCmpText by remember { mutableStateOf("") }
+    val scrollState = rememberScrollState()
+    val showScrollHint = scrollState.maxValue > scrollState.value
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(IosDemoPalette.screenBackground)
-            .verticalScroll(rememberScrollState())
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = "CMP Manager Methods",
-            style = MaterialTheme.typography.headlineMedium,
-            color = IosDemoPalette.titleIndigo
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(IosDemoPalette.screenBackground)
+                .verticalScroll(scrollState)
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Image(
+                painter = painterResource(R.mipmap.ic_launcher_foreground),
+                contentDescription = "iubenda",
+                modifier = Modifier.size(72.dp)
+            )
 
-        DemoButton(
+            Text(
+                text = "CMP Manager Methods",
+                style = MaterialTheme.typography.headlineMedium,
+                color = IosDemoPalette.titleIndigo
+            )
+
+            DemoButton(
             text = "Check User Status",
             containerColor = IosDemoPalette.blue,
             onClick = {
@@ -105,6 +120,7 @@ fun CMPDemoScreen(
                         }
                     }.trim()
                 )
+                onOperationSuccess()
             }
         )
 
@@ -114,6 +130,7 @@ fun CMPDemoScreen(
             onClick = {
                 val cmpString = cmpManager.exportCMPInfo()
                 onLog("CMP String:\n$cmpString")
+                onOperationSuccess()
             }
         )
 
@@ -127,6 +144,7 @@ fun CMPDemoScreen(
                     endLoad(LoadingKeys.CHECK_AND_OPEN)
                     result.onSuccess {
                         onLog("Check and Open Consent Layer: success")
+                        onOperationSuccess()
                     }.onFailure { error ->
                         onLog("Check and Open Consent Layer failed: $error")
                     }
@@ -144,6 +162,7 @@ fun CMPDemoScreen(
                     endLoad(LoadingKeys.CONSENT_REQUIRED)
                     result.onSuccess { required ->
                         onLog("Consent required: $required")
+                        onOperationSuccess()
                     }.onFailure { error ->
                         onLog("isConsentRequired error: ${error.message}")
                     }
@@ -154,6 +173,7 @@ fun CMPDemoScreen(
         ConsentMultiSelectRow(
             cmpManager = cmpManager,
             onLog = onLog,
+            onOperationSuccess = onOperationSuccess,
             actionButtonText = "Enable",
             actionButtonColor = IosDemoPalette.cyan,
             isActionLoading = isLoading(LoadingKeys.VENDORS_ENABLE),
@@ -175,6 +195,7 @@ fun CMPDemoScreen(
         ConsentMultiSelectRow(
             cmpManager = cmpManager,
             onLog = onLog,
+            onOperationSuccess = onOperationSuccess,
             actionButtonText = "Disable",
             actionButtonColor = IosDemoPalette.red,
             isActionLoading = isLoading(LoadingKeys.VENDORS_DISABLE),
@@ -196,6 +217,7 @@ fun CMPDemoScreen(
         ConsentMultiSelectRow(
             cmpManager = cmpManager,
             onLog = onLog,
+            onOperationSuccess = onOperationSuccess,
             actionButtonText = "Enable",
             actionButtonColor = IosDemoPalette.mint,
             isActionLoading = isLoading(LoadingKeys.PURPOSES_ENABLE),
@@ -217,6 +239,7 @@ fun CMPDemoScreen(
         ConsentMultiSelectRow(
             cmpManager = cmpManager,
             onLog = onLog,
+            onOperationSuccess = onOperationSuccess,
             actionButtonText = "Disable",
             actionButtonColor = IosDemoPalette.red,
             isActionLoading = isLoading(LoadingKeys.PURPOSES_DISABLE),
@@ -245,6 +268,7 @@ fun CMPDemoScreen(
                     endLoad(LoadingKeys.REJECT_ALL)
                     result.onSuccess {
                         onLog("All consents rejected")
+                        onOperationSuccess()
                     }.onFailure { error ->
                         onLog("Reject all error: ${error.message}")
                     }
@@ -262,6 +286,7 @@ fun CMPDemoScreen(
                     endLoad(LoadingKeys.ACCEPT_ALL)
                     result.onSuccess {
                         onLog("All consents accepted")
+                        onOperationSuccess()
                     }.onFailure { error ->
                         onLog("Accept all error: ${error.message}")
                     }
@@ -279,6 +304,7 @@ fun CMPDemoScreen(
                     endLoad(LoadingKeys.FORCE_OPEN)
                     result.onSuccess {
                         onLog("Open Consent Layer: success")
+                        onOperationSuccess()
                     }.onFailure { error ->
                         onLog("Open Consent Layer error: ${error.message}")
                     }
@@ -296,6 +322,7 @@ fun CMPDemoScreen(
                     endLoad(LoadingKeys.JUMP_SETTINGS)
                     result.onSuccess {
                         onLog("Jump to Settings: success")
+                        onOperationSuccess()
                     }.onFailure { error ->
                         onLog("Jump to Settings error: ${error.message}")
                     }
@@ -309,6 +336,7 @@ fun CMPDemoScreen(
             onClick = {
                 cmpManager.resetConsentManagementData()
                 onLog("Consent data reset (local CMP data cleared)")
+                onOperationSuccess()
             }
         )
 
@@ -333,6 +361,7 @@ fun CMPDemoScreen(
                     endLoad(LoadingKeys.IMPORT_CMP)
                     result.onSuccess {
                         onLog("CMP string imported successfully")
+                        onOperationSuccess()
                     }.onFailure { error ->
                         onLog("Import CMP string error: ${error.message}")
                     }
@@ -353,6 +382,7 @@ fun CMPDemoScreen(
                         }
                     }.trim()
                 )
+                onOperationSuccess()
             }
         )
 
@@ -385,6 +415,19 @@ fun CMPDemoScreen(
                 )
             }
         )
+        }
+
+        if (showScrollHint) {
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowDown,
+                contentDescription = "More content below",
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(12.dp)
+                    .size(20.dp),
+                tint = IosDemoPalette.gray
+            )
+        }
     }
 }
 
@@ -392,6 +435,7 @@ fun CMPDemoScreen(
 private fun ConsentMultiSelectRow(
     cmpManager: CMPManager,
     onLog: (String) -> Unit,
+    onOperationSuccess: () -> Unit,
     actionButtonText: String,
     actionButtonColor: Color,
     isActionLoading: Boolean,
@@ -487,6 +531,7 @@ private fun ConsentMultiSelectRow(
                 onIds(ids) { result ->
                     result.onSuccess {
                         onLog(successMessage(ids))
+                        onOperationSuccess()
                     }.onFailure { error ->
                         onLog("$errorLogPrefix: ${error.message}")
                     }
