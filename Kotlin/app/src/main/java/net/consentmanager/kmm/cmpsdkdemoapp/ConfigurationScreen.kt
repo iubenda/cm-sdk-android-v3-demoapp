@@ -2,7 +2,6 @@ package net.consentmanager.kmm.cmpsdkdemoapp
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +14,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -30,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -92,7 +90,7 @@ fun ConfigurationScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor()
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                 .testTag("Language")
                         )
                         DropdownMenu(
@@ -151,7 +149,7 @@ fun ConfigurationScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = positionExpanded) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor()
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                 .testTag("Position")
                         )
                         DropdownMenu(
@@ -183,7 +181,7 @@ fun ConfigurationScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = backgroundExpanded) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor()
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                 .testTag("Background")
                         )
                         DropdownMenu(
@@ -211,32 +209,6 @@ fun ConfigurationScreen(
                         steps = 5,
                         modifier = Modifier.fillMaxWidth().testTag("Corner Radius")
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Respects Safe Area", style = MaterialTheme.typography.bodyMedium)
-                        Switch(
-                            checked = configuration.respectsSafeArea,
-                            onCheckedChange = { onConfigurationChange(configuration.copy(respectsSafeArea = it)) },
-                            modifier = Modifier.testTag("Respects Safe Area")
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Allows Orientation Changes", style = MaterialTheme.typography.bodyMedium)
-                        Switch(
-                            checked = configuration.allowsOrientationChanges,
-                            onCheckedChange = { onConfigurationChange(configuration.copy(allowsOrientationChanges = it)) },
-                            modifier = Modifier.testTag("Allows Orientation Changes")
-                        )
-                    }
                 }
             }
 
@@ -257,11 +229,11 @@ fun ConfigurationScreen(
 
     if (showValidationAlert) {
         AlertDialog(
-            onDismissRequest = { showValidationAlert = false },
+            onDismissRequest = { },
             title = { Text("Invalid Configuration") },
             text = { Text(configuration.validationError ?: "") },
             confirmButton = {
-                Button(onClick = { showValidationAlert = false }) { Text("OK") }
+                Button(onClick = { }) { Text("OK") }
             }
         )
     }

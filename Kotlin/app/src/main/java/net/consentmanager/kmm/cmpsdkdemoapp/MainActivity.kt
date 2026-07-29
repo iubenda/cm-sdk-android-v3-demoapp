@@ -1,7 +1,6 @@
 package net.consentmanager.kmm.cmpsdkdemoapp
 
 import android.content.res.Configuration
-import net.consentmanager.kmm.cmpsdkdemoapp.BuildConfig
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,10 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,11 +24,16 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import net.consentmanager.cm_sdk_android_v3.CMPManager
 import net.consentmanager.cm_sdk_android_v3.CMPManagerDelegate
-import net.consentmanager.cm_sdk_android_v3.UrlConfig
+import net.consentmanager.kmm.cmpsdkdemoapp.ui.theme.CMPSDKDemoAppTheme
 
 /** Intent extra to skip ConfigurationScreen (for UI tests). */
 const val EXTRA_SKIP_CONFIG = "skip_config"
 
+/**
+ * Demo application shell for exercising [CMPManager] during development, QA, and sales.
+ * UI changes here apply to this demo app only; they do not change consent UI embedded in host apps
+ * via the SDK (e.g. WebView or native consent layer).
+ */
 class MainActivity : ComponentActivity(), CMPManagerDelegate {
     private var cmpManager: CMPManager? = null
     private lateinit var analytics: FirebaseAnalytics
@@ -45,21 +49,23 @@ class MainActivity : ComponentActivity(), CMPManagerDelegate {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        analytics = Firebase.analytics
+        window.decorView.post {
+            analytics = Firebase.analytics
+        }
 
         if (skipConfig) {
             hasConfiguration = true
         }
 
         setContent {
-            MaterialTheme {
+            CMPSDKDemoAppTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     when {
                         isConsentInitialized -> {
-                            cmpManager?.let { CMPDemoScreen(it) }
+                            cmpManager?.let { CMPDemoWithNav(it) }
                         }
                         hasConfiguration -> {
                             ConsentLoadingScreen(onInit = { initCMPAndOpenConsent() })
@@ -85,7 +91,9 @@ class MainActivity : ComponentActivity(), CMPManagerDelegate {
     private fun ConsentLoadingScreen(onInit: () -> Unit) {
         LaunchedEffect(Unit) { onInit() }
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .safeDrawingPadding(),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()

@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "net.consentmanager.kmm.cmpsdkdemoapp"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.firebase.analytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -64,9 +65,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("com.google.firebase:firebase-analytics")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.cmsdkv3)
 }
