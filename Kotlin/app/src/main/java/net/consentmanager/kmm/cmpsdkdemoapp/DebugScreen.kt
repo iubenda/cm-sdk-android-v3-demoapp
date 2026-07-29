@@ -29,11 +29,8 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import net.consentmanager.cm_sdk_android_v3.CMPManager
 import net.consentmanager.kmm.cmpsdkdemoapp.debug.IabStorageDebugHelper
 
-private const val ANDROID_TEST_INTERSTITIAL_UNIT_ID =
-    "ca-app-pub-3940256099942544/1033173712"
 private const val DEBUG_LOG_TAG = "CmpDebug"
 
 private fun Context.findActivity(): Activity? {
@@ -47,7 +44,6 @@ private fun Context.findActivity(): Activity? {
 
 @Composable
 fun DebugScreen(
-    cmpManager: CMPManager,
     onLog: (String) -> Unit,
     onOperationSuccess: () -> Unit = {},
 ) {
@@ -70,29 +66,6 @@ fun DebugScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         DemoButton(
-            text = stringResource(R.string.debug_open_cmp),
-            containerColor = IosDemoPalette.indigo,
-            isLoading = cmpBusy,
-            onClick = {
-                val operationId = nextId()
-                cmpBusy = true
-                onLog("CMP#$operationId Button pressed")
-                cmpManager.checkAndOpen { result ->
-                    result
-                        .onSuccess {
-                            onLog("CMP#$operationId checkAndOpen success")
-                            onOperationSuccess()
-                        }
-                        .onFailure { error ->
-                            onLog("CMP#$operationId checkAndOpen failed: ${error.message}")
-                        }
-                    cmpBusy = false
-                    onLog("CMP#$operationId Button operation finished")
-                }
-            },
-        )
-
-        DemoButton(
             text = stringResource(R.string.debug_load_ad),
             containerColor = IosDemoPalette.indigo,
             isLoading = adBusy,
@@ -108,11 +81,11 @@ fun DebugScreen(
                     )
                     onLog(
                         "ADMOB#$operationId InterstitialAd.load start " +
-                            "adUnitId=$ANDROID_TEST_INTERSTITIAL_UNIT_ID",
+                            "adUnitId=${BuildConfig.ADMOB_INTERSTITIAL_UNIT_ID}",
                     )
                     InterstitialAd.load(
                         context,
-                        ANDROID_TEST_INTERSTITIAL_UNIT_ID,
+                        BuildConfig.ADMOB_INTERSTITIAL_UNIT_ID,
                         AdRequest.Builder().build(),
                         object : InterstitialAdLoadCallback() {
                             override fun onAdLoaded(ad: InterstitialAd) {
@@ -224,33 +197,6 @@ fun DebugScreen(
                 } finally {
                     mutationBusy = false
                     onLog("IAB#$operationId Button operation finished")
-                }
-            },
-        )
-
-        DemoButton(
-            text = stringResource(R.string.debug_dump_prefs),
-            containerColor = IosDemoPalette.indigo,
-            isLoading = dumpBusy,
-            onClick = {
-                val operationId = nextId()
-                dumpBusy = true
-                onLog("PREFS#$operationId Button pressed")
-                try {
-                    val entries = IabStorageDebugHelper.dumpPrefs(
-                        IabStorageDebugHelper.preferences(context),
-                    )
-                    IabStorageDebugHelper.formatDumpLogLines(entries).forEach { line ->
-                        onLog(line)
-                        Log.i("CmpDebugPrefs", line)
-                    }
-                    onOperationSuccess()
-                } catch (error: Throwable) {
-                    onLog("PREFS#$operationId Operation failed: ${error.message}")
-                    Log.e("CmpDebugPrefs", "dumpPrefs failed", error)
-                } finally {
-                    dumpBusy = false
-                    onLog("PREFS#$operationId Button operation finished")
                 }
             },
         )

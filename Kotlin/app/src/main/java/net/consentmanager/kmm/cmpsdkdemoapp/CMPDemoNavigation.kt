@@ -67,6 +67,7 @@ fun CMPDemoWithNav(cmpManager: CMPManager) {
     var destination by remember { mutableIntStateOf(DEST_HOME) }
     var previousTab by remember { mutableIntStateOf(DEST_HOME) }
     var menuExpanded by remember { mutableStateOf(false) }
+    var debugUnlocked by remember { mutableStateOf(false) }
     var logsHighlightGeneration by remember { mutableIntStateOf(0) }
     val logLines = remember { mutableStateListOf<String>() }
     fun appendLog(message: String) {
@@ -118,14 +119,16 @@ fun CMPDemoWithNav(cmpManager: CMPManager) {
                                 expanded = menuExpanded,
                                 onDismissRequest = { menuExpanded = false }
                             ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.menu_debug)) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        previousTab = destination
-                                        destination = DEST_DEBUG
-                                    }
-                                )
+                                if (debugUnlocked) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.menu_debug)) },
+                                        onClick = {
+                                            menuExpanded = false
+                                            previousTab = destination
+                                            destination = DEST_DEBUG
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -168,11 +171,16 @@ fun CMPDemoWithNav(cmpManager: CMPManager) {
                 DEST_HOME -> CMPDemoScreen(
                     cmpManager = cmpManager,
                     onLog = ::appendLog,
-                    onOperationSuccess = ::onOperationSuccess
+                    onOperationSuccess = ::onOperationSuccess,
+                    onDebugUnlock = {
+                        if (!debugUnlocked) {
+                            debugUnlocked = true
+                            appendLog("Debug mode unlocked")
+                        }
+                    }
                 )
                 DEST_LOGS -> LogScreen(logLines = logLines)
                 DEST_DEBUG -> DebugScreen(
-                    cmpManager = cmpManager,
                     onLog = ::appendLog,
                     onOperationSuccess = ::onOperationSuccess
                 )
