@@ -1,5 +1,11 @@
 <resources>
-    <string name="app_name">CMPSDKDemoApp</string>
+    <string name="app_name">Iubenda CMP SDK Demo App</string>
     <string name="nav_home">Home</string>
     <string name="nav_logs">Logs</string>
+    <string name="menu_content_description">Menu</string>
+    <string name="menu_debug">Debug</string>
+    <string name="debug_title">Debug</string>
+    <string name="debug_back_content_description">Back</string>
+    <string name="debug_load_ad">Load and show demo ad</string>
+    <string name="debug_corrupt_iab">Corrupt TC String and CMP ID</string>
 </resources>
