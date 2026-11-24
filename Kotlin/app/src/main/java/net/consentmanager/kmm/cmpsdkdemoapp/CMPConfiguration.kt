@@ -38,7 +38,8 @@ data class CMPConfiguration(
         language = language,
         appName = appName.trim(),
         noHash = true,
-        webViewConnectionTimeoutMillis = 10000L
+        webViewConnectionTimeoutMillis = 10000L,
+        forceRegulation = "ROW"
     )
 
     fun toConsentLayerUIConfig(): ConsentLayerUIConfig = ConsentLayerUIConfig(
@@ -52,10 +53,10 @@ data class CMPConfiguration(
 
     companion object {
         val default = CMPConfiguration(
-            codeId = "f5e3b73592c3c",
-            language = "EN",
+            codeId = "408c3627-f7a8-4a35-978a-041643cfdc9b",
+            language = "IT",
             appName = "CMDemoAppKotlin",
-            domain = "a.delivery.consentmanager.net",
+            domain = "cdn.iubenda.com",
             position = WebviewPosition.FULL_SCREEN,
             backgroundStyle = WebviewBackgroundStyle.DIMMED_BLACK,
             cornerRadius = 0f,

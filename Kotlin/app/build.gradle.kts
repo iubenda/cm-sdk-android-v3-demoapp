@@ -23,8 +23,16 @@ fun requireReleaseProperty(name: String): String {
     )
 }
 
-val debugAdmobAppId = "ca-app-pub-3940256099942544~3347511713"
-val debugAdmobInterstitialUnitId = "ca-app-pub-3940256099942544/1033173712"
+val googleSampleAdmobPublisher = "3940256099942544"
+val debugAdmobAppId = "ca-app-pub-$googleSampleAdmobPublisher~3347511713"
+val debugAdmobInterstitialUnitId = "ca-app-pub-$googleSampleAdmobPublisher/1033173712"
+
+fun admobPublisherId(adMobAppId: String): String {
+  val match =
+      Regex("""ca-app-pub-(\d+)~""").find(adMobAppId)
+        ?: throw GradleException("Invalid AdMob app ID format: $adMobAppId")
+  return match.groupValues[1]
+}
 
 val adiRegistrationSource = rootProject.file("adi-registration.properties")
 val adiRegistrationAssetDir = file("src/main/assets")
@@ -58,8 +66,8 @@ android {
         applicationId = "net.consentmanager.kmm.cmdemoappkotlin"
         minSdk = 23
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -164,8 +172,33 @@ tasks.matching { it.name == "bundleRelease" || it.name == "assembleRelease" }.co
                     "See adi-registration.properties.example."
             )
         }
-        requireReleaseProperty("admobAppId")
-        requireReleaseProperty("admobInterstitialUnitId")
+        val releaseAdmobAppId = requireReleaseProperty("admobAppId")
+        val releaseAdmobInterstitialUnitId = requireReleaseProperty("admobInterstitialUnitId")
+        if (
+            releaseAdmobAppId.contains(googleSampleAdmobPublisher) ||
+                releaseAdmobInterstitialUnitId.contains(googleSampleAdmobPublisher)
+        ) {
+            throw GradleException(
+                "Release builds must not use Google's sample AdMob IDs ($googleSampleAdmobPublisher). " +
+                    "Set production admobAppId and admobInterstitialUnitId in keystore.properties."
+            )
+        }
+        val appAdsFile = rootProject.file("../public/app-ads.txt")
+        if (appAdsFile.exists()) {
+            val appAdsText = appAdsFile.readText()
+            val appAdsPublisher =
+                Regex("""pub-(\d+)""").find(appAdsText)?.groupValues?.get(1)
+            val releasePublisher = admobPublisherId(releaseAdmobAppId)
+            if (appAdsPublisher != null && appAdsPublisher != releasePublisher) {
+                throw GradleException(
+                    "public/app-ads.txt publisher pub-$appAdsPublisher does not match " +
+                        "release AdMob app publisher pub-$releasePublisher. " +
+                        "Update app-ads.txt and redeploy Firebase Hosting."
+                )
+            }
+        } else {
+            logger.warn("public/app-ads.txt not found; skip AdMob app-ads.txt publisher check.")
+        }
     }
 }
 

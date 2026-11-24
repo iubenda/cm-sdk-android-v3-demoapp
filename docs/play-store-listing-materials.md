@@ -5,8 +5,8 @@ Draft copy for Play Console and a hosted privacy policy. **Legal/compliance must
 | Field | Value |
 |-------|--------|
 | App name | Iubenda CMP SDK Demo App |
-| Package name | `net.consentmanager.kmm.cmpsdkdemoapp` |
-| Version | 1.0.0 (versionCode 1) |
+| Package name | `net.consentmanager.kmm.cmdemoappkotlin` |
+| Version | 1.0.1 (versionCode 2) |
 | Category suggestion | Tools or Business |
 | Price | Free |
 | Contains ads | Yes |
@@ -27,7 +27,7 @@ Paste the text below on that page, then enter the URL in Play Console → **Poli
 
 **Last updated:** [DATE]  
 **App name:** Iubenda CMP SDK Demo App  
-**Package name:** net.consentmanager.kmm.cmpsdkdemoapp  
+**Package name:** net.consentmanager.kmm.cmdemoappkotlin  
 **Publisher:** [Iubenda S.p.A. / consentmanager AB — legal entity name]  
 **Contact:** [privacy@iubenda.com or support email]
 
@@ -181,7 +181,7 @@ What you can do:
 
 This is a demonstration app — not a production CMP admin tool. Default settings showcase a sample integration; you can enter your own test Code-ID and domain to validate against your CMP setup.
 
-Technical note: the Play Store listing name reflects Iubenda branding; the Android package identifier is net.consentmanager.kmm.cmpsdkdemoapp.
+Technical note: the Play Store listing name reflects Iubenda branding; the Android package identifier is net.consentmanager.kmm.cmdemoappkotlin.
 
 Documentation: https://help.consentmanager.net/books/cmp/chapter/integration-into-your-app---v3
 

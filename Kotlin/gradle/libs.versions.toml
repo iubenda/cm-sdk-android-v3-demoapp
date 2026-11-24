@@ -1,6 +1,6 @@
 [versions]
 agp = "9.1.0"
-cmsdkv3 = "3.9.1"
+cmsdkv3 = "3.10.0"
 firebaseBom = "34.11.0"
 kotlin = "2.3.20"
 coreKtx = "1.18.0"
