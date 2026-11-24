@@ -6,7 +6,9 @@ Play listing: [Iubenda CMP Demo App](https://play.google.com/store/apps/details?
 |-------|--------|
 | Package | `net.consentmanager.kmm.cmdemoappkotlin` |
 | Firebase (Analytics) | `mobile-sdk-demo-app-c323b` |
-| AdMob publisher (`app-ads.txt`) | `pub-8306556094229446` |
+| AdMob publisher (`app-ads.txt`) | `pub-9017919202204592` |
+| AdMob app ID (Android) | `ca-app-pub-9017919202204592~2786489551` |
+| Interstitial unit (AdMob console) | `ca-app-pub-9017919202204592/9403868793` |
 
 ## 1. Secrets and local files (gitignored)
 
@@ -44,7 +46,7 @@ firebase use mobile-sdk-demo-app-c323b
 firebase deploy --only hosting
 ```
 
-Confirm: `https://<your-hosting-domain>/app-ads.txt` contains the same publisher as release `admobAppId` (`pub-8306556094229446`).
+Confirm: `https://<your-hosting-domain>/app-ads.txt` contains the same publisher as release `admobAppId` (`pub-9017919202204592`).
 
 ## 4. AdMob (in-app ads, not Google Ads UA campaigns)
 
