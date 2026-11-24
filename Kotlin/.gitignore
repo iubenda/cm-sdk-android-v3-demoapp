@@ -23,6 +23,11 @@ local.properties
 /.kotlin/errors/errors-1772468402755.log
 /.kotlin/errors/errors-1772468456002.log
 /app/google-services.json
+/keystore.properties
+/app/src/main/assets/adi-registration.properties
+/upload-keystore.jks
+/adi-registration.properties
+*.jks
 /app/.idea/migrations.xml
 /app/.idea/misc.xml
 /app/.idea/runConfigurations.xml
@@ -36,3 +41,6 @@ local.properties
 /com.nomadfintech.bank.app.android-3fXgSUKnZitU7m0SLdg-sw==/split_config.xxhdpi.apk
 /app/.idea/vcs.xml
 /.vscode/settings.json
+/adi-registration.properties.bak
+/adi-registration.properties.example
+/keystore.properties.example

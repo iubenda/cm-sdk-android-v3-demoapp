@@ -30,6 +30,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.consentmanager.cm_sdk_android_v3.CMPManager
 
@@ -60,7 +62,8 @@ private object LoadingKeys {
 fun CMPDemoScreen(
     cmpManager: CMPManager,
     onLog: (String) -> Unit,
-    onOperationSuccess: () -> Unit = {}
+    onOperationSuccess: () -> Unit = {},
+    onDebugUnlock: () -> Unit = {}
 ) {
     val context = LocalContext.current
     var loadingKeys by remember { mutableStateOf(setOf<String>()) }
@@ -415,6 +418,7 @@ fun CMPDemoScreen(
                 )
             }
         )
+        VersionLabelFooter(onUnlock = onDebugUnlock)
         }
 
         if (showScrollHint) {
@@ -562,6 +566,36 @@ private fun ConsentMultiSelectRow(
             }
         }
     }
+}
+
+private const val DEBUG_UNLOCK_TAP_COUNT = 7
+private const val DEBUG_UNLOCK_TAP_WINDOW_MS = 2_000L
+
+@Composable
+private fun VersionLabelFooter(onUnlock: () -> Unit) {
+    var tapCount by remember { mutableIntStateOf(0) }
+    var lastTapMs by remember { mutableLongStateOf(0L) }
+    Text(
+        text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp)
+            .clickable {
+                val now = SystemClock.elapsedRealtime()
+                if (now - lastTapMs > DEBUG_UNLOCK_TAP_WINDOW_MS) {
+                    tapCount = 0
+                }
+                lastTapMs = now
+                tapCount++
+                if (tapCount >= DEBUG_UNLOCK_TAP_COUNT) {
+                    tapCount = 0
+                    onUnlock()
+                }
+            },
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+        textAlign = TextAlign.Center
+    )
 }
 
 @Composable

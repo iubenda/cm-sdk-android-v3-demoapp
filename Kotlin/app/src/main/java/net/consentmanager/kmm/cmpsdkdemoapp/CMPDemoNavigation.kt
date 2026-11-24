@@ -11,27 +11,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -48,13 +54,20 @@ import java.util.Date
 import java.util.Locale
 
 private const val MAX_LOG_LINES = 3_000
+private const val DEST_HOME = 0
+private const val DEST_LOGS = 1
+private const val DEST_DEBUG = 2
 
 private fun formatTimestamp(): String =
     SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CMPDemoWithNav(cmpManager: CMPManager) {
-    var tab by remember { mutableIntStateOf(0) }
+    var destination by remember { mutableIntStateOf(DEST_HOME) }
+    var previousTab by remember { mutableIntStateOf(DEST_HOME) }
+    var menuExpanded by remember { mutableStateOf(false) }
+    var debugUnlocked by remember { mutableStateOf(false) }
     var logsHighlightGeneration by remember { mutableIntStateOf(0) }
     val logLines = remember { mutableStateListOf<String>() }
     fun appendLog(message: String) {
@@ -67,30 +80,85 @@ fun CMPDemoWithNav(cmpManager: CMPManager) {
         logsHighlightGeneration++
     }
 
+    val showingDebug = destination == DEST_DEBUG
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = when (destination) {
+                            DEST_DEBUG -> stringResource(R.string.debug_title)
+                            DEST_LOGS -> stringResource(R.string.nav_logs)
+                            else -> stringResource(R.string.nav_home)
+                        }
+                    )
+                },
+                navigationIcon = {
+                    if (showingDebug) {
+                        IconButton(onClick = { destination = previousTab }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = stringResource(
+                                    R.string.debug_back_content_description
+                                )
+                            )
+                        }
+                    } else {
+                        Box {
+                            IconButton(onClick = { menuExpanded = true }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Menu,
+                                    contentDescription = stringResource(
+                                        R.string.menu_content_description
+                                    )
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = menuExpanded,
+                                onDismissRequest = { menuExpanded = false }
+                            ) {
+                                if (debugUnlocked) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.menu_debug)) },
+                                        onClick = {
+                                            menuExpanded = false
+                                            previousTab = destination
+                                            destination = DEST_DEBUG
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        },
         bottomBar = {
-            NavigationBar {
-                // Icons use contentDescription = null because visible labels supply TalkBack semantics (M3).
-                NavigationBarItem(
-                    selected = tab == 0,
-                    onClick = { tab = 0 },
-                    icon = {
-                        Icon(
-                            Icons.Filled.Home,
-                            contentDescription = null
-                        )
-                    },
-                    label = { Text(stringResource(R.string.nav_home)) }
-                )
-                NavigationBarItem(
-                    selected = tab == 1,
-                    onClick = { tab = 1 },
-                    icon = {
-                        LogsNavIconWithGlow(highlightGeneration = logsHighlightGeneration)
-                    },
-                    label = { Text(stringResource(R.string.nav_logs)) }
-                )
+            if (!showingDebug) {
+                NavigationBar {
+                    // Icons use contentDescription = null because visible labels supply TalkBack semantics (M3).
+                    NavigationBarItem(
+                        selected = destination == DEST_HOME,
+                        onClick = { destination = DEST_HOME },
+                        icon = {
+                            Icon(
+                                Icons.Filled.Home,
+                                contentDescription = null
+                            )
+                        },
+                        label = { Text(stringResource(R.string.nav_home)) }
+                    )
+                    NavigationBarItem(
+                        selected = destination == DEST_LOGS,
+                        onClick = { destination = DEST_LOGS },
+                        icon = {
+                            LogsNavIconWithGlow(highlightGeneration = logsHighlightGeneration)
+                        },
+                        label = { Text(stringResource(R.string.nav_logs)) }
+                    )
+                }
             }
         }
     ) { innerPadding ->
@@ -98,15 +166,24 @@ fun CMPDemoWithNav(cmpManager: CMPManager) {
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .statusBarsPadding()
         ) {
-            when (tab) {
-                0 -> CMPDemoScreen(
+            when (destination) {
+                DEST_HOME -> CMPDemoScreen(
                     cmpManager = cmpManager,
+                    onLog = ::appendLog,
+                    onOperationSuccess = ::onOperationSuccess,
+                    onDebugUnlock = {
+                        if (!debugUnlocked) {
+                            debugUnlocked = true
+                            appendLog("Debug mode unlocked")
+                        }
+                    }
+                )
+                DEST_LOGS -> LogScreen(logLines = logLines)
+                DEST_DEBUG -> DebugScreen(
                     onLog = ::appendLog,
                     onOperationSuccess = ::onOperationSuccess
                 )
-                1 -> LogScreen(logLines = logLines)
             }
         }
     }
